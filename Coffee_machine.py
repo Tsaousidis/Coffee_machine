@@ -7,20 +7,13 @@ machine_off = False
 def calculate_coins(quar, dim, nick, pen):
     return quar * 0.25 + dim * 0.1 + nick * 0.05 + pen * 0.01
 
-def enough_resources(ingr):
+def enough_resources(drink):
     missing_ingredients = []
-    if MENU[ingr]['ingredients']['water'] > resources['water']:
-        missing_ingredients.append("water")
-    if MENU[ingr]['ingredients']['coffee'] > resources['coffee']:
-        missing_ingredients.append("coffee")
-    if ingr != "espresso":
-        if MENU[ingr]['ingredients']['milk'] > resources['milk']:
-            missing_ingredients.append("milk")    
-
+    for ingredient, amount in MENU[drink]['ingredients'].items():
+        if amount > resources.get(ingredient, 0):
+            missing_ingredients.append(ingredient)
     if missing_ingredients:
-        missing_ingredients_message = ", ".join(missing_ingredients)
-        return f"Sorry there is not enough {missing_ingredients_message}."
-    
+        return f"Sorry, there is not enough {' and '.join(missing_ingredients)}."
     return True
 
 def manipulate_resources(beverage):
@@ -41,14 +34,26 @@ while not machine_off:
         print(f"Water: {resources['water']}ml\nMilk: {resources['milk']}ml\nCoffee: {resources['coffee']}g\nMoney: ${resources['money']}")
     elif drink in MENU.keys():    
         are_enough_resources = enough_resources(drink)
-        if are_enough_resources != True:
+        if not are_enough_resources:
             print(are_enough_resources)
         else:    
             print("Please insert coins")
-            quarter = int(input("How many quarters?: "))
-            dime = int(input("How many dimes?: "))
-            nickel = int(input("How many nickels?: "))
-            penny = int(input("How many pennys?: "))
+            while True:  # Loop until valid input is entered
+                try:
+                    quarter = int(input("How many quarters?: "))
+                    dime = int(input("How many dimes?: "))
+                    nickel = int(input("How many nickels?: "))
+                    penny = int(input("How many pennies?: "))
+                    
+                    # Check if the input is negative
+                    if quarter < 0 or dime < 0 or nickel < 0 or penny < 0:
+                        print("Please enter non-negative numbers.")
+                        continue  # Loop again to ask for input
+                    
+                    break  # Exit the loop if all inputs are valid
+                    
+                except ValueError:
+                    print("Please enter valid numbers for coins.")
 
             money_inserted = calculate_coins(quarter, dime, nickel, penny)
             if money_inserted < MENU[drink]['cost']:

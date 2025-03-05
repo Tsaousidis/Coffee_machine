@@ -23,6 +23,7 @@ cd Coffee_machine
 
 # Run the coffee machine program
 python coffee_machine.py
+```
 
 ---
 👨‍💻 Created by [Tsaousidis](https://github.com/Tsaousidis)
